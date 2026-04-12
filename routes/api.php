@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Models\Product;
+use App\Http\Controllers\Api\ProductController;
 
-Route::get('/products', function () {
-    return Product::all();
-});
+Route::get('/products', [ProductController::class, 'index']);
