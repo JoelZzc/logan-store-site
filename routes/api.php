@@ -2,8 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\CategoryController;
 
-Route::get('/products', [ProductController::class, 'index']);
-Route::post('/products', [ProductController::class, 'store']);
-Route::put('/products/{id}', [ProductController::class, 'update']);
-Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+Route::apiResource('products', ProductController::class);
+Route::apiResource('categories', CategoryController::class);
+
+// Ruta extra: productos filtrados por categoría
+// GET /api/categories/{category}/products
+Route::get('categories/{category}/products', [CategoryController::class, 'products']);

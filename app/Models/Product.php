@@ -14,6 +14,13 @@ class Product extends Model
         'description',
         'price',
         'stock',
-        'image_url'
+        'image_url',
+        'category_id',  // añadimos la FK
     ];
+
+    // Un producto pertenece a una categoría
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }
