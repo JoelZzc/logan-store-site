@@ -13,10 +13,9 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        Category::create([
-            ['name' => 'Hombre', 'slug' => 'hombre'],
-            ['name' => 'Mujer', 'slug' => 'mujer'],
-            ['name' => 'Niños', 'slug' => 'niños'],
-        ]);
+        Category::create(['name' => 'Hombre', 'slug' => 'hombre']);
+        Category::create(['name' => 'Mujer',  'slug' => 'mujer']);
+        Category::create(['name' => 'Niños',  'slug' => 'ninos']);
+
     }
 }
