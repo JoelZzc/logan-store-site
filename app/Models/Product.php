@@ -16,11 +16,20 @@ class Product extends Model
         'stock',
         'image_url',
         'category_id',  // añadimos la FK
+        'brand_id',
     ];
 
     // Un producto pertenece a una categoría
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function brand(){
+        return $this->belongsTo(Brand::class);
+    }
+
+    public function reviews(){
+        return $this->hasMany(Review::class);
     }
 }

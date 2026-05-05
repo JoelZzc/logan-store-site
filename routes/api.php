@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\ReviewController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
@@ -36,6 +37,14 @@ Route::middleware('auth:sanctum')->group(function(){
 Route::apiResource('brands', BrandController::class)->only(['index', 'show']);
 Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('brands', BrandController::class)->only(['store', 'update', 'destroy']);
+});
+
+//rutas publicas y protegidas reviews
+
+Route::get('products/{product}/reviews', [ReviewController::class,'index']);
+Route::middleware('auth:sanctum')->group(function(){
+    Route::post('products/{product}/reviews', [ReviewController::class, 'store']);
+    Route::delete('reviews/{review}',         [ReviewController::class, 'destroy']);
 });
 
 
