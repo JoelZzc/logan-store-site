@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
+use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ReviewController;
 
@@ -56,5 +57,15 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('addresses', [AddressController::class, 'store']);
     Route::put('addresses/{address}',[AddressController::class, 'update']);
     Route::delete('addresses/{address}',[AddressController::class, 'destroy']);
+});
+
+//rutas protegidas y publicas cupons
+
+Route::post('coupons/apply', [CouponController::class,'apply']);
+Route::middleware('auth:sanctum')->group(function(){
+    Route::get('coupons',[CouponController::class, 'index']);
+    Route::post('coupons', [CouponController::class, 'store']);
+    Route::put('coupons/{coupon}',[CouponController::class, 'update']);
+    Route::delete('coupons/{coupon}',[CouponController::class, 'destroy']);
 });
 
