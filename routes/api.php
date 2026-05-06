@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AddressController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CategoryController;
@@ -47,4 +48,13 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::delete('reviews/{review}',         [ReviewController::class, 'destroy']);
 });
 
+
+//rutas protegidas address
+
+Route::middleware('auth:sanctum')->group(function(){
+    Route::get('addresses',[AddressController::class, 'index']);
+    Route::post('addresses', [AddressController::class, 'store']);
+    Route::put('addresses/{address}',[AddressController::class, 'update']);
+    Route::delete('addresses/{address}',[AddressController::class, 'destroy']);
+});
 
