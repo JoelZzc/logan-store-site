@@ -21,14 +21,14 @@ export default function Products() {
         setLoading(true);
         try {
             const [productsRes, categoriesRes, brandsRes] = await Promise.all([
-                getProducts(filters),
+                getProducts({}),
                 getCategories(),
                 getBrands(),
             ]);
             
-            setProducts(productsRes.data.data || productsRes.data);
-            setCategories(categoriesRes.data.data || categoriesRes.data);
-            setBrands(brandsRes.data.data || brandsRes.data);
+            setProducts(productsRes.data.data || []);
+            setCategories(categoriesRes.data.data || []);
+            setBrands(brandsRes.data.data || []);
         } catch (error) {
             console.error('Error cargando datos:', error);
         }
