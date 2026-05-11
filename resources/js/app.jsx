@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
+import Admin from './pages/Admin';
 
 function App() {
     return (
@@ -25,6 +26,7 @@ function App() {
                         <Route path="/cart" element={<Cart />} />
                         <Route path="/checkout" element={<Checkout />} />
                         <Route path="/order-confirmation" element={<OrderConfirmation />} />
+                        <Route path="/admin" element={<Admin />} />
                     </Routes>
                 </BrowserRouter>
             </CartProvider>
