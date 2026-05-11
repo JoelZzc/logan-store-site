@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { getAddresses, createAddress, createOrder, applyCoupon } from '../services/api';
+import Navbar from '../components/Navbar';
 
 export default function Checkout() {
     const { user } = useAuth();

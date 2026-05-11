@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getProducts, getCategories, getBrands } from '../services/api';
 import { Link } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 export default function Products() {
     const [products, setProducts] = useState([]);

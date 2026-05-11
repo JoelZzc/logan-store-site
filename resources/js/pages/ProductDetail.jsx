@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getProduct, getProductReviews, createReview } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import Navbar from '../components/Navbar';
 
 export default function ProductDetail() {
     const { id } = useParams();
