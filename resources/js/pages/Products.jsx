@@ -37,6 +37,7 @@ export default function Products() {
 
     return (
         <div className="min-h-screen bg-gray-50">
+             <Navbar />
             {/* Header */}
             <div className="bg-white shadow">
                 <div className="max-w-7xl mx-auto px-4 py-6">
