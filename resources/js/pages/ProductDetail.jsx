@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getProduct, getProductReviews, createReview } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 export default function ProductDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { addToCart } = useCart();
     const [product, setProduct] = useState(null);
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -42,17 +44,7 @@ export default function ProductDetail() {
     };
 
     const handleAddToCart = () => {
-        // Por ahora solo guardamos en localStorage, luego haremos el contexto del carrito
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const existingItem = cart.find(item => item.product.id === product.id);
-        
-        if (existingItem) {
-            existingItem.quantity += quantity;
-        } else {
-            cart.push({ product, quantity });
-        }
-        
-        localStorage.setItem('cart', JSON.stringify(cart));
+        addToCart(product, quantity);
         alert('Producto agregado al carrito');
     };
 
