@@ -12,30 +12,54 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="bg-white shadow-md sticky top-0 z-50">
-            <div className="max-w-7xl mx-auto px-4">
+        <nav className="bg-white border-b border-[#e4e0db] sticky top-0 z-50">
+            <div className="max-w-7xl mx-auto px-10">
                 <div className="flex justify-between items-center h-16">
+
                     {/* Logo */}
-                    <Link to="/" className="text-2xl font-bold text-blue-600">
-                        Logan Store
+                    <Link to="/" className="no-underline">
+                        <div
+                            className="text-xl text-[#2a2826] font-light leading-none"
+                            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                        >
+                            LoGan
+                        </div>
+                        <div className="text-[8px] tracking-[.22em] text-[#7a7672] mt-0.5 font-light">
+                            PERFUMERÍA
+                        </div>
                     </Link>
 
                     {/* Links de navegación */}
-                    <div className="hidden md:flex items-center gap-6">
-                        <Link to="/" className="text-gray-700 hover:text-blue-600 transition">
-                            Inicio
+                    <div className="hidden md:flex items-center gap-8">
+                        <Link
+                            to="/"
+                            className="text-[11px] tracking-[.12em] text-[#7a7672] hover:text-[#2a2826] transition-colors no-underline font-light"
+                        >
+                            INICIO
                         </Link>
-                        <Link to="/products" className="text-gray-700 hover:text-blue-600 transition">
-                            Productos
+                        <Link
+                            to="/products"
+                            className="text-[11px] tracking-[.12em] text-[#7a7672] hover:text-[#2a2826] transition-colors no-underline font-light"
+                        >
+                            CATÁLOGO
                         </Link>
+                        {user && (
+                            <Link
+                                to="/admin"
+                                className="text-[11px] tracking-[.12em] text-[#7a7672] hover:text-[#2a2826] transition-colors no-underline font-light"
+                            >
+                                ADMIN
+                            </Link>
+                        )}
                     </div>
 
                     {/* Carrito y usuario */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-5">
+
                         {/* Carrito */}
-                        <Link to="/cart" className="relative">
+                        <Link to="/cart" className="relative text-[#2a2826] hover:text-[#b08070] transition-colors">
                             <svg
-                                className="w-6 h-6 text-gray-700 hover:text-blue-600 transition"
+                                className="w-5 h-5"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -43,12 +67,12 @@ export default function Navbar() {
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    strokeWidth="2"
+                                    strokeWidth="1.5"
                                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                                 />
                             </svg>
                             {getItemCount() > 0 && (
-                                <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                <span className="absolute -top-2 -right-2 bg-[#2a2826] text-[#f4f0ec] text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-light">
                                     {getItemCount()}
                                 </span>
                             )}
@@ -56,34 +80,35 @@ export default function Navbar() {
 
                         {/* Usuario */}
                         {user ? (
-                            <div className="flex items-center gap-3">
-                                <span className="text-gray-700 hidden md:block">
+                            <div className="flex items-center gap-4">
+                                <span className="text-[11px] tracking-[.06em] text-[#7a7672] hidden md:block font-light">
                                     Hola, {user.name}
                                 </span>
                                 <button
                                     onClick={handleLogout}
-                                    className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+                                    className="text-[10px] tracking-[.12em] text-[#7a7672] hover:text-[#2a2826] transition-colors bg-transparent border-none cursor-pointer font-light"
                                 >
-                                    Salir
+                                    SALIR
                                 </button>
                             </div>
                         ) : (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-4">
                                 <Link
                                     to="/login"
-                                    className="text-gray-700 hover:text-blue-600 transition"
+                                    className="text-[11px] tracking-[.1em] text-[#7a7672] hover:text-[#2a2826] transition-colors no-underline font-light"
                                 >
-                                    Entrar
+                                    ENTRAR
                                 </Link>
                                 <Link
                                     to="/register"
-                                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                                    className="bg-[#2a2826] text-[#f4f0ec] px-5 py-2 text-[10px] tracking-[.12em] hover:opacity-80 transition-opacity no-underline font-light"
                                 >
-                                    Registrarse
+                                    REGISTRARSE
                                 </Link>
                             </div>
                         )}
                     </div>
+
                 </div>
             </div>
         </nav>
