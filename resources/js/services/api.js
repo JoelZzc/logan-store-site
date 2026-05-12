@@ -48,4 +48,5 @@ export const updateAddress = (id, data) => api.put(`/addresses/${id}`, data);
 export const deleteAddress = (id) => api.delete(`/addresses/${id}`);
 
 // Coupons
+export const getCoupons = () => api.get('/coupons');
 export const applyCoupon = (code) => api.post('/coupons/apply', { code });
