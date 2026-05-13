@@ -7,16 +7,28 @@ export default function OrderConfirmation() {
 
     if (!order) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-[#f4f0ec] flex items-center justify-center">
                 <div className="text-center">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                    <div
+                        className="text-5xl font-light text-[#2a2826] mb-6"
+                        style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                    >
+                        LoGan
+                    </div>
+                    <h1
+                        className="text-2xl font-light text-[#2a2826] mb-3"
+                        style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                    >
                         No se encontró información del pedido
                     </h1>
+                    <p className="text-[11px] text-[#7a7672] font-light mb-8 tracking-wide">
+                        Es posible que el pedido haya expirado o no exista
+                    </p>
                     <Link
                         to="/"
-                        className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+                        className="inline-block bg-[#2a2826] text-[#f4f0ec] px-8 py-3 text-[10px] tracking-[.16em] font-light hover:opacity-80 transition-opacity no-underline"
                     >
-                        Volver al inicio
+                        VOLVER AL INICIO
                     </Link>
                 </div>
             </div>
@@ -24,95 +36,104 @@ export default function OrderConfirmation() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-white">
             <Navbar />
-            <div className="max-w-3xl mx-auto px-4 py-16">
-                <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-                    {/* Icono de éxito */}
-                    <div className="mb-6">
-                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                            <svg
-                                className="w-12 h-12 text-green-600"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M5 13l4 4L19 7"
-                                />
-                            </svg>
-                        </div>
+
+            <div className="max-w-2xl mx-auto px-10 py-16">
+
+                {/* Icono de éxito */}
+                <div className="text-center mb-10">
+                    <div className="w-16 h-16 bg-[#e8f0e4] flex items-center justify-center mx-auto mb-6">
+                        <svg
+                            className="w-8 h-8 text-[#3a6030]"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="1.5"
+                                d="M5 13l4 4L19 7"
+                            />
+                        </svg>
                     </div>
 
-                    <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                    <p className="text-[9px] tracking-[.22em] text-[#b08070] mb-3">PEDIDO PROCESADO</p>
+                    <h1
+                        className="text-4xl font-light text-[#2a2826] mb-4"
+                        style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                    >
                         ¡Pedido confirmado!
                     </h1>
-                    
-                    <p className="text-gray-600 mb-8">
+                    <p className="text-sm text-[#7a7672] font-light leading-relaxed max-w-sm mx-auto">
                         Tu pedido ha sido procesado exitosamente. Recibirás un correo de confirmación pronto.
                     </p>
+                </div>
 
-                    {/* Detalles del pedido */}
-                    <div className="bg-gray-50 rounded-lg p-6 mb-8 text-left">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">
+                {/* Detalles del pedido */}
+                <div className="border border-[#e4e0db] mb-10">
+
+                    <div className="bg-[#f4f0ec] px-8 py-5 border-b border-[#e4e0db]">
+                        <p className="text-[9px] tracking-[.18em] text-[#b08070] mb-1">RESUMEN</p>
+                        <h2
+                            className="text-lg font-light text-[#2a2826]"
+                            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                        >
                             Detalles del pedido
                         </h2>
-                        
-                        <div className="space-y-2 mb-4">
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Número de pedido:</span>
-                                <span className="font-semibold">#{order.id}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Estado:</span>
-                                <span className="font-semibold capitalize">{order.status}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Total:</span>
-                                <span className="font-semibold text-xl text-blue-600">
-                                    ${order.total}
-                                </span>
+                    </div>
+
+                    <div className="px-8 py-6 space-y-3 border-b border-[#e4e0db]">
+                        <div className="flex justify-between">
+                            <span className="text-[11px] text-[#7a7672] font-light tracking-wide">NÚMERO DE PEDIDO</span>
+                            <span className="text-[12px] text-[#2a2826] font-normal">#{order.id}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-[11px] text-[#7a7672] font-light tracking-wide">ESTADO</span>
+                            <span className="text-[12px] text-[#2a2826] font-normal capitalize">{order.status}</span>
+                        </div>
+                        <div className="flex justify-between pt-1 border-t border-[#e4e0db]">
+                            <span className="text-[11px] text-[#7a7672] font-light tracking-wide">TOTAL</span>
+                            <span className="text-sm text-[#2a2826] font-normal">${order.total}</span>
+                        </div>
+                    </div>
+
+                    {order.items && order.items.length > 0 && (
+                        <div className="px-8 py-6">
+                            <p className="text-[9px] tracking-[.16em] text-[#b08070] mb-4">PRODUCTOS</p>
+                            <div className="space-y-3">
+                                {order.items.map((item, index) => (
+                                    <div key={index} className="flex justify-between">
+                                        <span className="text-[12px] text-[#7a7672] font-light">
+                                            {item.product?.name || 'Producto'} ×{item.quantity}
+                                        </span>
+                                        <span className="text-[12px] text-[#2a2826] font-light">
+                                            ${(item.unit_price * item.quantity).toFixed(2)}
+                                        </span>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-
-                        {order.items && order.items.length > 0 && (
-                            <div className="border-t pt-4">
-                                <h3 className="font-semibold mb-2">Productos:</h3>
-                                <div className="space-y-2">
-                                    {order.items.map((item, index) => (
-                                        <div key={index} className="flex justify-between text-sm">
-                                            <span className="text-gray-700">
-                                                {item.product?.name || 'Producto'} x{item.quantity}
-                                            </span>
-                                            <span className="font-semibold">
-                                                ${(item.unit_price * item.quantity).toFixed(2)}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Botones */}
-                    <div className="flex gap-4 justify-center">
-                        <Link
-                            to="/products"
-                            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
-                        >
-                            Seguir comprando
-                        </Link>
-                        <Link
-                            to="/"
-                            className="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition"
-                        >
-                            Volver al inicio
-                        </Link>
-                    </div>
+                    )}
                 </div>
+
+                {/* Botones */}
+                <div className="flex gap-4 justify-center">
+                    <Link
+                        to="/products"
+                        className="bg-[#2a2826] text-[#f4f0ec] px-8 py-3 text-[10px] tracking-[.16em] font-light hover:opacity-80 transition-opacity no-underline"
+                    >
+                        SEGUIR COMPRANDO
+                    </Link>
+                    <Link
+                        to="/"
+                        className="border border-[#e4e0db] text-[#7a7672] px-8 py-3 text-[10px] tracking-[.16em] font-light hover:bg-[#f4f0ec] transition-colors no-underline"
+                    >
+                        VOLVER AL INICIO
+                    </Link>
+                </div>
+
             </div>
         </div>
     );
