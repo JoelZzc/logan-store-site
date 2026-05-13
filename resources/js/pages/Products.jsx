@@ -26,7 +26,7 @@ export default function Products() {
                 getCategories(),
                 getBrands(),
             ]);
-            
+
             setProducts(productsRes.data.data || []);
             setCategories(categoriesRes.data.data || []);
             setBrands(brandsRes.data.data || []);
@@ -37,45 +37,54 @@ export default function Products() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
-             <Navbar />
+        <div className="min-h-screen bg-white">
+            <Navbar />
+
             {/* Header */}
-            <div className="bg-white shadow">
-                <div className="max-w-7xl mx-auto px-4 py-6">
-                    <h1 className="text-3xl font-bold text-gray-900">Catálogo de Productos</h1>
+            <div className="bg-[#f4f0ec] border-b border-[#e4e0db]">
+                <div className="max-w-7xl mx-auto px-10 py-10">
+                    <p className="text-[9px] tracking-[.2em] text-[#b08070] mb-2">TIENDA</p>
+                    <h1
+                        className="text-3xl font-light text-[#2a2826]"
+                        style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                    >
+                        Catálogo de productos
+                    </h1>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className="max-w-7xl mx-auto px-10 py-10">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
+
                     {/* Filtros */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white p-6 rounded-lg shadow">
-                            <h2 className="text-xl font-bold mb-4">Filtros</h2>
-                            
+                        <div className="border border-[#e4e0db] p-6">
+
+                            <p className="text-[9px] tracking-[.18em] text-[#b08070] mb-5">FILTROS</p>
+
                             {/* Búsqueda */}
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Buscar
+                            <div className="mb-6">
+                                <label className="block text-[10px] tracking-[.1em] text-[#7a7672] mb-2 font-light">
+                                    BUSCAR
                                 </label>
                                 <input
                                     type="text"
                                     value={filters.search}
                                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                                     placeholder="Nombre del producto..."
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-4 py-3 border border-[#e4e0db] text-[#2a2826] text-sm font-light bg-white focus:outline-none focus:border-[#7a7672] transition-colors"
                                 />
                             </div>
 
                             {/* Categorías */}
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Categoría
+                            <div className="mb-6">
+                                <label className="block text-[10px] tracking-[.1em] text-[#7a7672] mb-2 font-light">
+                                    CATEGORÍA
                                 </label>
                                 <select
                                     value={filters.category}
                                     onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-4 py-3 border border-[#e4e0db] text-[#2a2826] text-sm font-light bg-white focus:outline-none focus:border-[#7a7672] transition-colors"
                                 >
                                     <option value="">Todas</option>
                                     {categories.map((cat) => (
@@ -87,14 +96,14 @@ export default function Products() {
                             </div>
 
                             {/* Marcas */}
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Marca
+                            <div className="mb-6">
+                                <label className="block text-[10px] tracking-[.1em] text-[#7a7672] mb-2 font-light">
+                                    MARCA
                                 </label>
                                 <select
                                     value={filters.brand}
                                     onChange={(e) => setFilters({ ...filters, brand: e.target.value })}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-4 py-3 border border-[#e4e0db] text-[#2a2826] text-sm font-light bg-white focus:outline-none focus:border-[#7a7672] transition-colors"
                                 >
                                     <option value="">Todas</option>
                                     {brands.map((brand) => (
@@ -107,9 +116,9 @@ export default function Products() {
 
                             <button
                                 onClick={() => setFilters({ category: '', brand: '', search: '' })}
-                                className="w-full bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition"
+                                className="w-full border border-[#e4e0db] text-[#7a7672] py-3 text-[10px] tracking-[.12em] font-light hover:bg-[#f4f0ec] transition-colors bg-white"
                             >
-                                Limpiar filtros
+                                LIMPIAR FILTROS
                             </button>
                         </div>
                     </div>
@@ -117,12 +126,16 @@ export default function Products() {
                     {/* Grid de productos */}
                     <div className="lg:col-span-3">
                         {loading ? (
-                            <div className="text-center py-12">
-                                <p className="text-gray-500">Cargando productos...</p>
+                            <div className="py-20 text-center">
+                                <p className="text-[#7a7672] text-[11px] tracking-widest font-light">
+                                    CARGANDO...
+                                </p>
                             </div>
                         ) : products.length === 0 ? (
-                            <div className="text-center py-12">
-                                <p className="text-gray-500">No se encontraron productos</p>
+                            <div className="py-20 text-center">
+                                <p className="text-[#7a7672] text-sm font-light">
+                                    No se encontraron productos
+                                </p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -130,25 +143,27 @@ export default function Products() {
                                     <Link
                                         key={product.id}
                                         to={`/products/${product.id}`}
-                                        className="bg-white rounded-lg shadow hover:shadow-lg transition"
+                                        className="group no-underline"
                                     >
-                                        <img
-                                            src={product.image_url || 'https://via.placeholder.com/300'}
-                                            alt={product.name}
-                                            className="w-full h-48 object-cover rounded-t-lg"
-                                        />
-                                        <div className="p-4">
-                                            <h3 className="font-bold text-lg text-gray-900 mb-2">
+                                        <div className="bg-[#f4f0ec] h-52 overflow-hidden mb-3 transition-colors group-hover:bg-[#ece8e4]">
+                                            <img
+                                                src={product.image_url || 'https://via.placeholder.com/300'}
+                                                alt={product.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="px-1">
+                                            <h3 className="text-sm font-normal text-[#2a2826] tracking-wide mb-1">
                                                 {product.name}
                                             </h3>
-                                            <p className="text-gray-600 text-sm mb-2 line-clamp-2">
+                                            <p className="text-[11px] text-[#7a7672] font-light mb-2 line-clamp-1">
                                                 {product.description}
                                             </p>
                                             <div className="flex justify-between items-center">
-                                                <span className="text-2xl font-bold text-blue-600">
+                                                <span className="text-sm text-[#2a2826] font-normal">
                                                     ${product.price}
                                                 </span>
-                                                <span className="text-sm text-gray-500">
+                                                <span className="text-[10px] text-[#7a7672] font-light">
                                                     Stock: {product.stock}
                                                 </span>
                                             </div>
@@ -158,6 +173,7 @@ export default function Products() {
                             </div>
                         )}
                     </div>
+
                 </div>
             </div>
         </div>
