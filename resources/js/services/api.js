@@ -26,6 +26,7 @@ export const logout = () => api.post('/logout');
 // Products
 export const getProducts = (params) => api.get('/products', { params });
 export const getProduct = (id) => api.get(`/products/${id}`);
+export const getInventoryAlerts = () => api.get('/products/inventory-alerts');
 
 // Categories
 export const getCategories = () => api.get('/categories');

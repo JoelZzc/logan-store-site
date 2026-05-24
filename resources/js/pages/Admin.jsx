@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getProducts, getCategories, getBrands, getCoupons } from '../services/api';
+import { getProducts, getCategories, getBrands, getCoupons, getInventoryAlerts } from '../services/api';
 import Navbar from '../components/Navbar';
 import api from '../services/api';
 
@@ -18,12 +18,16 @@ export default function Admin() {
         description: '',
         price: '',
         stock: '',
+        min_stock: '',
+        reorder_point: '',
+        supplier_notes: '',
         category_id: '',
         brand_id: '',
         image_url: '',
     });
 
     const [coupons, setCoupons] = useState([]);
+    const [alerts, setAlerts] = useState([]);
     const [showCouponForm, setShowCouponForm] = useState(false);
     const [editingCoupon, setEditingCoupon] = useState(null);
     const [couponFormData, setCouponFormData] = useState({
@@ -55,6 +59,10 @@ export default function Admin() {
             setCategories(categoriesRes.data.data || categoriesRes.data);
             setBrands(brandsRes.data.data || brandsRes.data);
             setCoupons(couponsRes.data.data || couponsRes.data);
+
+            // Cargar alertas de inventario
+            const alertsRes = await getInventoryAlerts();
+            setAlerts(alertsRes.data.data || alertsRes.data);
         } catch (error) {
             console.error('Error cargando datos:', error);
         }
@@ -141,6 +149,9 @@ export default function Admin() {
             description: product.description || '',
             price: product.price,
             stock: product.stock,
+            min_stock: product.min_stock || '',
+            reorder_point: product.reorder_point || '',
+            supplier_notes: product.supplier_notes || '',
             category_id: product.category?.id || '',
             brand_id: product.brand?.id || '',
             image_url: product.image_url || '',
@@ -166,6 +177,9 @@ export default function Admin() {
             description: '',
             price: '',
             stock: '',
+            min_stock: '',
+            reorder_point: '',
+            supplier_notes: '',
             category_id: '',
             brand_id: '',
             image_url: '',
@@ -273,6 +287,27 @@ export default function Admin() {
                                 onChange={(e) => setFormData({...formData, image_url: e.target.value})}
                                 className={inputCls}
                             />
+                            <input
+                                type="number"
+                                placeholder="Stock mínimo (alerta)"
+                                value={formData.min_stock}
+                                onChange={(e) => setFormData({...formData, min_stock: e.target.value})}
+                                className={inputCls}
+                            />
+                            <input
+                                type="number"
+                                placeholder="Punto de reorden"
+                                value={formData.reorder_point}
+                                onChange={(e) => setFormData({...formData, reorder_point: e.target.value})}
+                                className={inputCls}
+                            />
+                            <textarea
+                                placeholder="Notas del proveedor (opcional)"
+                                value={formData.supplier_notes}
+                                onChange={(e) => setFormData({...formData, supplier_notes: e.target.value})}
+                                className={`col-span-2 ${inputCls} resize-none`}
+                                rows="2"
+                            />
                             <textarea
                                 placeholder="Descripción"
                                 value={formData.description}
@@ -319,8 +354,16 @@ export default function Admin() {
                                     <td className="px-6 py-4 text-[12px] text-[#2a2826] font-normal">{product.name}</td>
                                     <td className="px-6 py-4 text-[12px] text-[#2a2826] font-light">${product.price}</td>
                                     <td className="px-6 py-4 text-[12px] font-light">
-                                        <span className={product.stock === 0 ? 'text-[#8a3a2a]' : 'text-[#2a2826]'}>
+                                        <span className={
+                                            product.stock === 0
+                                                ? 'text-red-600 font-semibold'
+                                                : product.stock <= product.min_stock
+                                                    ? 'text-orange-500 font-semibold'
+                                                    : 'text-[#2a2826]'
+                                        }>
                                             {product.stock}
+                                            {product.stock === 0 && ' ⚠ SIN STOCK'}
+                                            {product.stock > 0 && product.stock <= product.min_stock && ' ⚠ BAJO'}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-[12px] text-[#7a7672] font-light">{product.category?.name}</td>
@@ -343,6 +386,40 @@ export default function Admin() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* ── ALERTAS DE INVENTARIO ── */}
+                {alerts.length > 0 && (
+                    <div className="mb-16">
+                        <div className="border-b border-[#e4e0db] pb-6 mb-8">
+                            <p className="text-[9px] tracking-[.2em] text-red-500 mb-1">INVENTARIO</p>
+                            <h2 className="text-2xl font-light text-[#2a2826]"
+                                style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                                Alertas de Stock Bajo
+                            </h2>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {alerts.map((product) => (
+                                <div key={product.id} className="border border-orange-200 bg-orange-50 p-4 rounded">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className="text-sm font-normal text-[#2a2826]">{product.name}</h3>
+                                        {product.stock === 0
+                                            ? <span className="text-[9px] tracking-widest text-red-600 bg-red-100 px-2 py-1">SIN STOCK</span>
+                                            : <span className="text-[9px] tracking-widest text-orange-600 bg-orange-100 px-2 py-1">STOCK BAJO</span>
+                                        }
+                                    </div>
+                                    <div className="text-[11px] text-[#7a7672] space-y-1">
+                                        <p>Stock actual: <span className="font-semibold text-red-600">{product.stock}</span></p>
+                                        <p>Stock mínimo: <span className="font-semibold">{product.min_stock}</span></p>
+                                        <p>Punto de reorden: <span className="font-semibold">{product.reorder_point}</span></p>
+                                        {product.supplier_notes && (
+                                            <p className="mt-2 text-[#b08070] italic">{product.supplier_notes}</p>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* ── CUPONES ── */}
                 <div className="flex justify-between items-center mb-8 border-b border-[#e4e0db] pb-6">

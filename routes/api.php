@@ -15,6 +15,7 @@ Route::post('/login',    [AuthController::class, 'login']);
 Route::post('/logout',   [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 //rutas publicas y protegidas productos
+Route::get('products/inventory-alerts', [ProductController::class, 'inventoryAlerts'])->middleware('auth:sanctum');
 Route::apiResource('products', ProductController::class)->only(['index','show']);
 Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('products', ProductController::class)->only(['store', 'update', 'destroy']);

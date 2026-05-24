@@ -12,7 +12,7 @@ class ProductController extends Controller
     // GET /api/products
     public function index(Request $request)
     {
-        $query = Product::with('category'); // carga la categoría en la misma query (evita N+1)
+        $query = Product::with('category', 'brand');
 
         // Filtro opcional: GET /api/products?category=perfumes-mujer
         if ($request->has('category')) {
@@ -20,6 +20,17 @@ class ProductController extends Controller
         }
 
         return ProductResource::collection($query->get());
+    }
+
+    // GET /api/products/inventory-alerts
+    public function inventoryAlerts()
+    {
+        $products = Product::with('category', 'brand')
+            ->whereColumn('stock', '<=', 'min_stock')
+            ->orderBy('stock', 'asc')
+            ->get();
+
+        return ProductResource::collection($products);
     }
 
     // GET /api/products/{product}
@@ -33,11 +44,16 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'stock'       => 'required|integer|min:0',
-            'image_url'   => 'nullable|url',
+            'name'           => 'required|string|max:255',
+            'description'    => 'nullable|string',
+            'price'          => 'required|numeric|min:0',
+            'stock'          => 'required|integer|min:0',
+            'min_stock'      => 'nullable|integer|min:0',
+            'reorder_point'  => 'nullable|integer|min:0',
+            'supplier_notes' => 'nullable|string',
+            'image_url'      => 'nullable|url',
+            'category_id'    => 'nullable|exists:categories,id',
+            'brand_id'       => 'nullable|exists:brands,id',
         ]);
 
         $product = Product::create($validated);
@@ -49,11 +65,16 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
-            'name'        => 'sometimes|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'sometimes|numeric|min:0',
-            'stock'       => 'sometimes|integer|min:0',
-            'image_url'   => 'nullable|url',
+            'name'           => 'sometimes|string|max:255',
+            'description'    => 'nullable|string',
+            'price'          => 'sometimes|numeric|min:0',
+            'stock'          => 'sometimes|integer|min:0',
+            'min_stock'      => 'nullable|integer|min:0',
+            'reorder_point'  => 'nullable|integer|min:0',
+            'supplier_notes' => 'nullable|string',
+            'image_url'      => 'nullable|url',
+            'category_id'    => 'nullable|exists:categories,id',
+            'brand_id'       => 'nullable|exists:brands,id',
         ]);
 
         $product->update($validated);

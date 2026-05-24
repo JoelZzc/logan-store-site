@@ -21,10 +21,12 @@ class ProductResource extends JsonResource
             'description' => $this->description,
             'price'       => (float) $this->price,
             'stock'       => $this->stock,
+            'min_stock'   => $this->min_stock,
+            'reorder_point' => $this->reorder_point,
+            'supplier_notes' => $this->supplier_notes,
             'image_url'   => $this->image_url,
-            // whenLoaded: solo incluye la categoría si fue cargada con with()
-            // evita N+1 queries accidentales
             'category'    => new CategoryResource($this->whenLoaded('category')),
+            'brand'       => new BrandResource($this->whenLoaded('brand')),
             'created_at'  => $this->created_at->toDateTimeString(),
         ];
     }

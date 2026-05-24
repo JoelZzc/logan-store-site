@@ -15,8 +15,11 @@ class Product extends Model
         'price',
         'stock',
         'image_url',
-        'category_id',  // añadimos la FK
+        'category_id',
         'brand_id',
+        'min_stock',
+        'reorder_point',
+        'supplier_notes',
     ];
 
     // Un producto pertenece a una categoría
