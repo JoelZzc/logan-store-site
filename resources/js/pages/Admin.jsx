@@ -127,18 +127,26 @@ export default function Admin() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            // Limpiar campos vacíos para que no fallen las validaciones
+            const cleanData = Object.fromEntries(
+                Object.entries(formData).map(([key, value]) => [
+                    key,
+                    value === '' ? null : value
+                ])
+            );
+
             if (editingProduct) {
-                await api.put(`/products/${editingProduct.id}`, formData);
+                await api.put(`/products/${editingProduct.id}`, cleanData);
                 alert('Producto actualizado');
             } else {
-                await api.post('/products', formData);
+                await api.post('/products', cleanData);
                 alert('Producto creado');
             }
             resetForm();
             loadData();
         } catch (error) {
-            console.error('Error guardando producto:', error);
-            alert('Error al guardar producto');
+            console.error('Error guardando producto:', error.response?.data || error);
+            alert(error.response?.data?.message || 'Error al guardar producto');
         }
     };
 

@@ -51,7 +51,7 @@ class ProductController extends Controller
             'min_stock'      => 'nullable|integer|min:0',
             'reorder_point'  => 'nullable|integer|min:0',
             'supplier_notes' => 'nullable|string',
-            'image_url'      => 'nullable|url',
+            'image_url'      => 'nullable|string|max:500',
             'category_id'    => 'nullable|exists:categories,id',
             'brand_id'       => 'nullable|exists:brands,id',
         ]);
@@ -72,7 +72,7 @@ class ProductController extends Controller
             'min_stock'      => 'nullable|integer|min:0',
             'reorder_point'  => 'nullable|integer|min:0',
             'supplier_notes' => 'nullable|string',
-            'image_url'      => 'nullable|url',
+            'image_url'      => 'nullable|string|max:500',
             'category_id'    => 'nullable|exists:categories,id',
             'brand_id'       => 'nullable|exists:brands,id',
         ]);
