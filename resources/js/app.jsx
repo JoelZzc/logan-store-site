@@ -11,6 +11,7 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import Admin from './pages/Admin';
+import Dashboard from './pages/Dashboard';
 
 function App() {
     return (
@@ -27,6 +28,7 @@ function App() {
                         <Route path="/checkout" element={<Checkout />} />
                         <Route path="/order-confirmation" element={<OrderConfirmation />} />
                         <Route path="/admin" element={<Admin />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
                     </Routes>
                 </BrowserRouter>
             </CartProvider>

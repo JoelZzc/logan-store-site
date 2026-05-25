@@ -51,6 +51,14 @@ export default function Navbar() {
                                 ADMIN
                             </Link>
                         )}
+                        {user && (
+                            <Link
+                                to="/dashboard"
+                                className="text-[11px] tracking-[.12em] text-[#7a7672] hover:text-[#2a2826] transition-colors no-underline font-light"
+                            >
+                                DASHBOARD
+                            </Link>
+                        )}
                     </div>
 
                     {/* Carrito y usuario */}
