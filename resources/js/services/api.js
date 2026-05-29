@@ -41,6 +41,8 @@ export const createReview = (productId, data) => api.post(`/products/${productId
 // Orders
 export const getOrders = () => api.get('/orders');
 export const createOrder = (data) => api.post('/orders', data);
+export const getAdminOrders = () => api.get('/admin/orders');
+export const updateOrderStatus = (id, status) => api.patch(`/admin/orders/${id}/status`, { status });
 
 // Addresses
 export const getAddresses = () => api.get('/addresses');
@@ -50,5 +52,11 @@ export const deleteAddress = (id) => api.delete(`/addresses/${id}`);
 
 // Reports
 export const getSalesReport = (period) => api.get('/reports/sales', { params: { period } });
+
+// Shipments
+export const getShipments = () => api.get('/shipments');
+export const createShipment = (orderId, data) => api.post(`/orders/${orderId}/shipment`, data);
+export const updateShipment = (shipmentId, data) => api.put(`/shipments/${shipmentId}`, data);
+export const getOrderShipment = (orderId) => api.get(`/orders/${orderId}/shipment`);
 export const getCoupons = () => api.get('/coupons');
 export const applyCoupon = (code) => api.post('/coupons/apply', { code });

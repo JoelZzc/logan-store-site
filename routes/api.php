@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\ShipmentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CategoryController;
@@ -31,9 +32,11 @@ Route::middleware('auth:sanctum')->group(function(){
 });
 
 //rutas protegidas orders
-
 Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('orders', OrderController::class)->only(['index', 'show', 'store']);
+    // Admin: ver todos los pedidos y cambiar estado
+    Route::get('admin/orders', [OrderController::class, 'adminIndex']);
+    Route::patch('admin/orders/{order}/status', [OrderController::class, 'updateStatus']);
 });
 
 //rutas publicas y protegidas brands
@@ -64,6 +67,17 @@ Route::middleware('auth:sanctum')->group(function(){
 // rutas protegidas reportes
 Route::middleware('auth:sanctum')->group(function(){
     Route::get('reports/sales', [ReportController::class, 'sales']);
+});
+
+// rutas de envíos
+Route::middleware('auth:sanctum')->group(function(){
+    // Admin: listar todos los envíos y actualizar
+    Route::get('shipments', [ShipmentController::class, 'index']);
+    Route::put('shipments/{shipment}', [ShipmentController::class, 'update']);
+    // Admin: crear envío para un pedido
+    Route::post('orders/{order}/shipment', [ShipmentController::class, 'store']);
+    // Cliente: ver envío de su pedido
+    Route::get('orders/{order}/shipment', [ShipmentController::class, 'show']);
 });
 
 //rutas protegidas y publicas cupons
