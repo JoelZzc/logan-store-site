@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getProducts, getCategories, getBrands, getCoupons, getInventoryAlerts, getShipments, createShipment, updateShipment, getAdminOrders } from '../services/api';
+import { getProducts, getCategories, getBrands, getCoupons, getInventoryAlerts, getShipments, createShipment, updateShipment, getAdminOrders, getReturns, updateReturn } from '../services/api';
 import Navbar from '../components/Navbar';
 import api from '../services/api';
 
@@ -18,11 +18,11 @@ export default function Admin() {
         min_stock: '', reorder_point: '', supplier_notes: '',
         category_id: '', brand_id: '', image_url: '',
     });
-
     const [coupons, setCoupons] = useState([]);
     const [alerts, setAlerts] = useState([]);
     const [shipments, setShipments] = useState([]);
     const [adminOrders, setAdminOrders] = useState([]);
+    const [returns, setReturns] = useState([]);
     const [showShipmentForm, setShowShipmentForm] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [editingShipment, setEditingShipment] = useState(null);
@@ -56,6 +56,8 @@ export default function Admin() {
             setShipments(shipmentsRes.data.data || shipmentsRes.data);
             const ordersRes = await getAdminOrders();
             setAdminOrders(ordersRes.data);
+            const returnsRes = await getReturns();
+            setReturns(returnsRes.data.data || returnsRes.data);
         } catch (error) {
             console.error('Error cargando datos:', error);
         }
@@ -94,13 +96,8 @@ export default function Admin() {
     const handleShipmentSubmit = async (e) => {
         e.preventDefault();
         try {
-            if (editingShipment) {
-                await updateShipment(editingShipment.id, shipmentFormData);
-                alert('Envío actualizado');
-            } else {
-                await createShipment(selectedOrder.id, shipmentFormData);
-                alert('Envío creado');
-            }
+            if (editingShipment) { await updateShipment(editingShipment.id, shipmentFormData); alert('Envío actualizado'); }
+            else { await createShipment(selectedOrder.id, shipmentFormData); alert('Envío creado'); }
             resetShipmentForm(); loadData();
         } catch (error) { alert(error.response?.data?.message || 'Error al guardar envío'); }
     };
@@ -108,7 +105,6 @@ export default function Admin() {
     const handleEditShipment = (shipment) => {
         setEditingShipment(shipment);
         setShipmentFormData({ carrier: shipment.carrier, tracking_number: shipment.tracking_number || '', status: shipment.status, notes: shipment.notes || '' });
-        // Buscar la orden correspondiente para mostrar el contexto
         const order = adminOrders.find(o => o.id === shipment.order_id);
         setSelectedOrder(order || { id: shipment.order_id, user: 'Pedido #' + shipment.order_id });
         setShowShipmentForm(true);
@@ -117,6 +113,14 @@ export default function Admin() {
     const resetShipmentForm = () => {
         setShipmentFormData({ carrier: '', tracking_number: '', status: 'pending', notes: '' });
         setEditingShipment(null); setSelectedOrder(null); setShowShipmentForm(false);
+    };
+
+    const handleReturnAction = async (returnId, status, adminNotes = '') => {
+        try {
+            await updateReturn(returnId, { status, admin_notes: adminNotes });
+            alert(status === 'approved' ? 'Devolución aprobada' : 'Devolución rechazada');
+            loadData();
+        } catch (error) { alert('Error al procesar la devolución'); }
     };
 
     const handleSubmit = async (e) => {
@@ -348,7 +352,6 @@ export default function Admin() {
                     </div>
                 </div>
 
-                {/* Lista de pedidos pendientes */}
                 <div className="mb-8">
                     <p className="text-[10px] tracking-[.14em] text-[#7a7672] mb-4">PEDIDOS PENDIENTES DE ENVÍO</p>
                     {adminOrders.filter(o => o.status === 'pending' || o.status === 'paid').length === 0 ? (
@@ -365,13 +368,11 @@ export default function Admin() {
                                                 <span className="text-[12px] text-[#2a2826]">${parseFloat(order.total).toLocaleString('es-MX', {minimumFractionDigits: 2})}</span>
                                                 <span className="text-[9px] tracking-widest text-[#b08070] bg-[#f5e8e0] px-2 py-1">{order.status.toUpperCase()}</span>
                                             </div>
-                                            {/* Productos */}
                                             <div className="text-[11px] text-[#7a7672] font-light mb-2">
                                                 {order.items.map((item, i) => (
                                                     <span key={i}>{item.product} x{item.qty}{i < order.items.length - 1 ? ', ' : ''}</span>
                                                 ))}
                                             </div>
-                                            {/* Dirección */}
                                             {order.address ? (
                                                 <div className="text-[11px] text-[#7a7672] font-light">
                                                     📍 {order.address.street}, {order.address.city}, {order.address.state} {order.address.zip_code}
@@ -384,10 +385,8 @@ export default function Admin() {
                                             {order.shipment ? (
                                                 <span className="text-[9px] tracking-widest text-[#3a6030] bg-[#e8f0e4] px-3 py-1">ENVÍO CREADO</span>
                                             ) : (
-                                                <button
-                                                    onClick={() => { setSelectedOrder(order); setShowShipmentForm(true); }}
-                                                    className="bg-[#2a2826] text-[#f4f0ec] px-4 py-2 text-[10px] tracking-[.12em] hover:opacity-80 transition-opacity"
-                                                >
+                                                <button onClick={() => { setSelectedOrder(order); setShowShipmentForm(true); }}
+                                                    className="bg-[#2a2826] text-[#f4f0ec] px-4 py-2 text-[10px] tracking-[.12em] hover:opacity-80 transition-opacity">
                                                     CREAR ENVÍO
                                                 </button>
                                             )}
@@ -399,12 +398,9 @@ export default function Admin() {
                     )}
                 </div>
 
-                {/* Formulario de envío */}
                 {showShipmentForm && selectedOrder && (
                     <div className="border border-[#2a2826] p-8 mb-8 bg-[#f4f0ec]">
-                        <p className="text-[9px] tracking-[.16em] text-[#b08070] mb-1">
-                            {editingShipment ? 'EDITAR ENVÍO' : 'REGISTRAR ENVÍO'}
-                        </p>
+                        <p className="text-[9px] tracking-[.16em] text-[#b08070] mb-1">{editingShipment ? 'EDITAR ENVÍO' : 'REGISTRAR ENVÍO'}</p>
                         <h3 className="text-lg font-light text-[#2a2826] mb-1" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
                             Pedido #{selectedOrder.id} — {selectedOrder.user}
                         </h3>
@@ -434,9 +430,8 @@ export default function Admin() {
                     </div>
                 )}
 
-                {/* Tabla de envíos registrados */}
                 <p className="text-[10px] tracking-[.14em] text-[#7a7672] mb-4 mt-8">ENVÍOS REGISTRADOS</p>
-                <div className="border border-[#e4e0db] overflow-hidden">
+                <div className="border border-[#e4e0db] overflow-hidden mb-16">
                     <table className="w-full">
                         <thead>
                             <tr className="bg-[#f4f0ec] border-b border-[#e4e0db]">
@@ -476,6 +471,70 @@ export default function Admin() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* ── DEVOLUCIONES ── */}
+                <div className="flex justify-between items-center mb-8 border-b border-[#e4e0db] pb-6">
+                    <div>
+                        <p className="text-[9px] tracking-[.2em] text-[#b08070] mb-1">POSTVENTA</p>
+                        <h2 className="text-2xl font-light text-[#2a2826]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                            Gestión de devoluciones
+                        </h2>
+                    </div>
+                </div>
+
+                {returns.length === 0 ? (
+                    <p className="text-[12px] text-[#7a7672] font-light py-4 mb-16">No hay solicitudes de devolución</p>
+                ) : (
+                    <div className="space-y-4 mb-16">
+                        {returns.map((ret) => (
+                            <div key={ret.id} className="border border-[#e4e0db] p-6">
+                                <div className="flex justify-between items-start">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-4 mb-3">
+                                            <span className="text-[11px] text-[#7a7672]">#{ret.id}</span>
+                                            <span className="text-[12px] font-normal text-[#2a2826]">
+                                                {ret.user?.name || 'Cliente'}
+                                            </span>
+                                            <span className="text-[11px] text-[#7a7672]">Pedido #{ret.order_id}</span>
+                                            <span className={`text-[9px] px-3 py-1 tracking-[.08em] font-light ${
+                                                ret.status === 'approved' ? 'bg-[#e8f0e4] text-[#3a6030]' :
+                                                ret.status === 'rejected' ? 'bg-[#fde0d8] text-[#8a3a2a]' :
+                                                'bg-[#f5e8e0] text-[#b08070]'
+                                            }`}>
+                                                {ret.status === 'pending' ? 'PENDIENTE' :
+                                                 ret.status === 'approved' ? 'APROBADA' : 'RECHAZADA'}
+                                            </span>
+                                        </div>
+                                        <div className="mb-2">
+                                            <span className="text-[10px] tracking-[.08em] text-[#7a7672]">MOTIVO · </span>
+                                            <span className="text-[12px] text-[#2a2826] font-light">{ret.reason}</span>
+                                        </div>
+                                        {ret.admin_notes && (
+                                            <div className="text-[11px] text-[#b08070] italic mt-1">
+                                                Nota: {ret.admin_notes}
+                                            </div>
+                                        )}
+                                        <div className="text-[10px] text-[#7a7672] font-light mt-2">
+                                            Solicitado: {new Date(ret.created_at).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                        </div>
+                                    </div>
+                                    {ret.status === 'pending' && (
+                                        <div className="ml-6 flex flex-col gap-2 flex-shrink-0">
+                                            <button onClick={() => handleReturnAction(ret.id, 'approved')}
+                                                className="bg-[#2a2826] text-[#f4f0ec] px-5 py-2 text-[10px] tracking-[.12em] font-light hover:opacity-80 transition-opacity">
+                                                APROBAR
+                                            </button>
+                                            <button onClick={() => handleReturnAction(ret.id, 'rejected')}
+                                                className="border border-[#e4e0db] text-[#7a7672] px-5 py-2 text-[10px] tracking-[.12em] font-light hover:bg-[#f4f0ec] transition-colors">
+                                                RECHAZAR
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
 
             </div>
         </div>

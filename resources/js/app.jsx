@@ -12,6 +12,7 @@ import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import Admin from './pages/Admin';
 import Dashboard from './pages/Dashboard';
+import Orders from './pages/Orders';
 
 function App() {
     return (
@@ -29,6 +30,7 @@ function App() {
                         <Route path="/order-confirmation" element={<OrderConfirmation />} />
                         <Route path="/admin" element={<Admin />} />
                         <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/orders" element={<Orders />} />
                     </Routes>
                 </BrowserRouter>
             </CartProvider>

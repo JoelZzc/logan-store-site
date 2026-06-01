@@ -15,7 +15,7 @@ class OrderController extends Controller
     {
         return $request->user()
             ->orders()
-            ->with(['items.product', 'address', 'shipment'])
+            ->with(['items.product', 'address', 'shipment', 'orderReturn'])
             ->orderByDesc('created_at')
             ->get();
     }
@@ -80,7 +80,7 @@ class OrderController extends Controller
     // GET /api/admin/orders — todos los pedidos (admin)
     public function adminIndex()
     {
-        $orders = Order::with(['user', 'items.product', 'address', 'shipment'])
+        $orders = Order::with(['user', 'items.product', 'address', 'shipment', 'orderReturn'])
             ->orderByDesc('created_at')
             ->get()
             ->map(fn($order) => [

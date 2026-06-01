@@ -45,6 +45,14 @@ export default function Navbar() {
                         </Link>
                         {user && (
                             <Link
+                                to="/orders"
+                                className="text-[11px] tracking-[.12em] text-[#7a7672] hover:text-[#2a2826] transition-colors no-underline font-light"
+                            >
+                                MIS PEDIDOS
+                            </Link>
+                        )}
+                        {user && (
+                            <Link
                                 to="/admin"
                                 className="text-[11px] tracking-[.12em] text-[#7a7672] hover:text-[#2a2826] transition-colors no-underline font-light"
                             >
