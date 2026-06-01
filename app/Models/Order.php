@@ -32,4 +32,8 @@ class Order extends Model
         return $this->hasOne(Shipment::class);
     }
 
+    public function orderReturn(){
+        return $this->hasOne(OrderReturn::class);
+    }
+
 }

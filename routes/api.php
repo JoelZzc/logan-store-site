@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ShipmentController;
+use App\Http\Controllers\Api\OrderReturnController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CategoryController;
@@ -78,6 +79,13 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('orders/{order}/shipment', [ShipmentController::class, 'store']);
     // Cliente: ver envío de su pedido
     Route::get('orders/{order}/shipment', [ShipmentController::class, 'show']);
+});
+
+// rutas de devoluciones
+Route::middleware('auth:sanctum')->group(function(){
+    Route::get('returns', [OrderReturnController::class, 'index']);
+    Route::post('orders/{order}/return', [OrderReturnController::class, 'store']);
+    Route::patch('returns/{orderReturn}', [OrderReturnController::class, 'update']);
 });
 
 //rutas protegidas y publicas cupons

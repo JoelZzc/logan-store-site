@@ -58,5 +58,10 @@ export const getShipments = () => api.get('/shipments');
 export const createShipment = (orderId, data) => api.post(`/orders/${orderId}/shipment`, data);
 export const updateShipment = (shipmentId, data) => api.put(`/shipments/${shipmentId}`, data);
 export const getOrderShipment = (orderId) => api.get(`/orders/${orderId}/shipment`);
+
+// Returns
+export const getReturns = () => api.get('/returns');
+export const requestReturn = (orderId, data) => api.post(`/orders/${orderId}/return`, data);
+export const updateReturn = (returnId, data) => api.patch(`/returns/${returnId}`, data);
 export const getCoupons = () => api.get('/coupons');
 export const applyCoupon = (code) => api.post('/coupons/apply', { code });
