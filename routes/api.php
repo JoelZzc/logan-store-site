@@ -35,7 +35,8 @@ Route::middleware('auth:sanctum')->group(function(){
 //rutas protegidas orders
 Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('orders', OrderController::class)->only(['index', 'show', 'store']);
-    // Admin: ver todos los pedidos y cambiar estado
+});
+Route::middleware(['auth:sanctum', 'admin'])->group(function(){
     Route::get('admin/orders', [OrderController::class, 'adminIndex']);
     Route::patch('admin/orders/{order}/status', [OrderController::class, 'updateStatus']);
 });
@@ -66,25 +67,26 @@ Route::middleware('auth:sanctum')->group(function(){
 });
 
 // rutas protegidas reportes
-Route::middleware('auth:sanctum')->group(function(){
+Route::middleware(['auth:sanctum', 'admin'])->group(function(){
     Route::get('reports/sales', [ReportController::class, 'sales']);
 });
 
 // rutas de envíos
 Route::middleware('auth:sanctum')->group(function(){
-    // Admin: listar todos los envíos y actualizar
+    Route::get('orders/{order}/shipment', [ShipmentController::class, 'show']); // cliente
+});
+Route::middleware(['auth:sanctum', 'admin'])->group(function(){
     Route::get('shipments', [ShipmentController::class, 'index']);
     Route::put('shipments/{shipment}', [ShipmentController::class, 'update']);
-    // Admin: crear envío para un pedido
     Route::post('orders/{order}/shipment', [ShipmentController::class, 'store']);
-    // Cliente: ver envío de su pedido
-    Route::get('orders/{order}/shipment', [ShipmentController::class, 'show']);
 });
 
 // rutas de devoluciones
 Route::middleware('auth:sanctum')->group(function(){
+    Route::post('orders/{order}/return', [OrderReturnController::class, 'store']); // cliente
+});
+Route::middleware(['auth:sanctum', 'admin'])->group(function(){
     Route::get('returns', [OrderReturnController::class, 'index']);
-    Route::post('orders/{order}/return', [OrderReturnController::class, 'store']);
     Route::patch('returns/{orderReturn}', [OrderReturnController::class, 'update']);
 });
 

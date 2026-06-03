@@ -51,7 +51,7 @@ export default function Navbar() {
                                 MIS PEDIDOS
                             </Link>
                         )}
-                        {user && (
+                        {user?.role === 'admin' && (
                             <Link
                                 to="/admin"
                                 className="text-[11px] tracking-[.12em] text-[#7a7672] hover:text-[#2a2826] transition-colors no-underline font-light"
@@ -59,7 +59,7 @@ export default function Navbar() {
                                 ADMIN
                             </Link>
                         )}
-                        {user && (
+                        {user?.role === 'admin' && (
                             <Link
                                 to="/dashboard"
                                 className="text-[11px] tracking-[.12em] text-[#7a7672] hover:text-[#2a2826] transition-colors no-underline font-light"
