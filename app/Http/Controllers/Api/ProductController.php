@@ -14,9 +14,22 @@ class ProductController extends Controller
     {
         $query = Product::with('category', 'brand');
 
-        // Filtro opcional: GET /api/products?category=perfumes-mujer
-        if ($request->has('category')) {
-            $query->whereHas('category', fn($q) => $q->where('slug', $request->category));
+        // Filtro por categoría (ID)
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Filtro por marca (ID)
+        if ($request->filled('brand')) {
+            $query->where('brand_id', $request->brand);
+        }
+
+        // Filtro por búsqueda
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
         }
 
         return ProductResource::collection($query->get());

@@ -15,26 +15,44 @@ export default function Products() {
     });
 
     useEffect(() => {
-        loadData();
+        // Cargar categorías y marcas solo una vez al montar
+        loadCategoriesAndBrands();
+    }, []);
+
+    useEffect(() => {
+        // Cargar productos cada vez que cambian los filtros
+        loadProducts();
     }, [filters]);
 
-    const loadData = async () => {
-        setLoading(true);
+    const loadCategoriesAndBrands = async () => {
         try {
-            const [productsRes, categoriesRes, brandsRes] = await Promise.all([
-                getProducts({}),
+            const [categoriesRes, brandsRes] = await Promise.all([
                 getCategories(),
                 getBrands(),
             ]);
-
-            setProducts(productsRes.data.data || []);
             setCategories(categoriesRes.data.data || []);
             setBrands(brandsRes.data.data || []);
         } catch (error) {
-            console.error('Error cargando datos:', error);
+            console.error('Error cargando filtros:', error);
+        }
+    };
+
+    const loadProducts = async () => {
+        setLoading(true);
+        try {
+            const productsRes = await getProducts({
+                category: filters.category || undefined,
+                brand: filters.brand || undefined,
+                search: filters.search || undefined,
+            });
+            setProducts(productsRes.data.data || []);
+        } catch (error) {
+            console.error('Error cargando productos:', error);
         }
         setLoading(false);
     };
+
+    // Eliminamos la función loadData que ya no se usa
 
     return (
         <div className="min-h-screen bg-white">
