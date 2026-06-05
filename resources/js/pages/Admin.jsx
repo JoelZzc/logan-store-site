@@ -501,7 +501,7 @@ export default function Admin() {
                                                 ret.status === 'rejected' ? 'bg-[#fde0d8] text-[#8a3a2a]' :
                                                 'bg-[#f5e8e0] text-[#b08070]'
                                             }`}>
-                                                {ret.status === 'pending' ? 'PENDIENTE' :
+                                                {ret.status === 'requested' ? 'SOLICITADA' :
                                                  ret.status === 'approved' ? 'APROBADA' : 'RECHAZADA'}
                                             </span>
                                         </div>
@@ -518,7 +518,7 @@ export default function Admin() {
                                             Solicitado: {new Date(ret.created_at).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}
                                         </div>
                                     </div>
-                                    {ret.status === 'pending' && (
+                                    {ret.status === 'requested' && (
                                         <div className="ml-6 flex flex-col gap-2 flex-shrink-0">
                                             <button onClick={() => handleReturnAction(ret.id, 'approved')}
                                                 className="bg-[#2a2826] text-[#f4f0ec] px-5 py-2 text-[10px] tracking-[.12em] font-light hover:opacity-80 transition-opacity">
