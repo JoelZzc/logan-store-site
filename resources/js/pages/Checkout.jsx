@@ -108,10 +108,11 @@ export default function Checkout() {
 
         try {
             const orderData = {
-                address_id: selectedAddress,
+                address_id:  selectedAddress,
+                coupon_code: appliedCoupon ? appliedCoupon.code : null,
                 items: cart.map(item => ({
                     product_id: item.product.id,
-                    quantity: item.quantity,
+                    quantity:   item.quantity,
                 })),
             };
 

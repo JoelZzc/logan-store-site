@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
@@ -38,6 +39,7 @@ class OrderController extends Controller
             'items.*.product_id' => 'required|integer|exists:products,id',
             'items.*.quantity'   => 'required|integer|min:1',
             'address_id'         => 'nullable|exists:addresses,id',
+            'coupon_code'        => 'nullable|string',
         ]);
 
         $order = DB::transaction(function () use ($request, $validated) {
@@ -62,10 +64,25 @@ class OrderController extends Controller
                 $product->decrement('stock', $item['quantity']);
             }
 
+            // Aplicar cupón si se mandó
+            if (!empty($validated['coupon_code'])) {
+                $coupon = Coupon::where('code', $validated['coupon_code'])
+                    ->where('is_active', true)
+                    ->first();
+
+                if ($coupon && ($coupon->expires_at === null || $coupon->expires_at->isFuture())) {
+                    if ($coupon->discount_type === 'percentage') {
+                        $total = $total - ($total * $coupon->discount_value / 100);
+                    } else {
+                        $total = max(0, $total - $coupon->discount_value);
+                    }
+                }
+            }
+
             $order = Order::create([
                 'user_id'    => $request->user()->id,
                 'address_id' => $validated['address_id'] ?? null,
-                'total'      => $total,
+                'total'      => round($total, 2),
                 'status'     => 'pending',
             ]);
 
