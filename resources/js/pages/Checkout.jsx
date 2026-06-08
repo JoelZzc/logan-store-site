@@ -91,7 +91,7 @@ export default function Checkout() {
         if (appliedCoupon.discount_type === 'percentage') {
             return (subtotal * appliedCoupon.discount_value) / 100;
         }
-        return appliedCoupon.discount_value;
+        return Number(appliedCoupon.discount_value);
     };
 
     const getFinalTotal = () => {
