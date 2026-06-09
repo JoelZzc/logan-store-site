@@ -44,8 +44,10 @@ export default function ProductDetail() {
     };
 
     const handleAddToCart = () => {
-        addToCart(product, quantity);
-        alert('Producto agregado al carrito');
+        const added = addToCart(product, quantity);
+        if (added) {
+            alert('Producto agregado al carrito');
+        }
     };
 
     const handleSubmitReview = async (e) => {

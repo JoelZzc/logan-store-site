@@ -36,24 +36,18 @@ class OrderController extends Controller
     // POST /api/orders — crear pedido
     public function store(Request $request)
     {
-        $rules = [
+        $validated = $request->validate([
             'items'              => 'required|array|min:1',
             'items.*.product_id' => 'required|integer|exists:products,id',
             'items.*.quantity'   => 'required|integer|min:1',
             'address_id'         => 'nullable|exists:addresses,id',
             'coupon_code'        => 'nullable|string',
-            'payment_method'     => 'required|in:cash,card',
-            'saved_card_id'      => 'nullable|integer|exists:saved_cards,id',
-        ];
-
-        if ($request->input('payment_method') === 'card' && !$request->filled('saved_card_id')) {
-            $rules['cardholder_name'] = ['required', 'string', 'max:255'];
-            $rules['card_number']     = ['required', 'string', 'regex:/^([0-9]{16}|[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4})$/'];
-            $rules['expiry_date']     = ['required', 'string', 'regex:/^(0[1-9]|1[0-2])\/[0-9]{2}$/'];
-            $rules['cvv']             = ['required', 'string', 'regex:/^\d{3,4}$/'];
-        }
-
-        $validated = $request->validate($rules);
+            'payment_method'     => 'nullable|in:cash,card',
+            'cardholder_name'    => 'nullable|string|max:255',
+            'card_number'        => 'nullable|string',
+            'expiry_date'        => 'nullable|string',
+            'cvv'                => 'nullable|string',
+        ]);
 
         $order = DB::transaction(function () use ($request, $validated) {
 
@@ -92,81 +86,13 @@ class OrderController extends Controller
                 }
             }
 
-            // Procesar método de pago
-            $cardholderName = null;
-            $cardLastFour   = null;
-            $cardBrand      = null;
-            $savedCardId    = null;
-
-            if ($validated['payment_method'] === 'card') {
-                if (!empty($validated['saved_card_id'])) {
-                    $savedCard = SavedCard::where('user_id', $request->user()->id)
-                        ->where('id', $validated['saved_card_id'])
-                        ->first();
-                    if (!$savedCard) {
-                        throw new \Exception("La tarjeta seleccionada no es válida.");
-                    }
-                    $cardholderName = $savedCard->cardholder_name;
-                    $cardLastFour   = $savedCard->last_four;
-                    $cardBrand      = $savedCard->brand;
-                    $savedCardId    = $savedCard->id;
-                } else {
-                    $expiryParts = explode('/', str_replace(' ', '', $validated['expiry_date']));
-                    if (count($expiryParts) !== 2) {
-                        $expiryParts = [substr($validated['expiry_date'], 0, 2), substr($validated['expiry_date'], 2)];
-                    }
-                    $expiryMonth = (int) $expiryParts[0];
-                    $expiryYear  = (int) $expiryParts[1];
-
-                    // Validar expiración básica
-                    $currentYear = (int) date('y');
-                    $currentMonth = (int) date('m');
-                    if ($expiryYear < $currentYear || ($expiryYear === $currentYear && $expiryMonth < $currentMonth)) {
-                        throw new \Exception("La tarjeta ingresada ha expirado.");
-                    }
-
-                    // Limpiar guiones del número de tarjeta
-                    $cleanCardNumber = str_replace('-', '', $validated['card_number']);
-
-                    $cardHash = hash('sha256', $cleanCardNumber);
-                    $lastFour = substr($cleanCardNumber, -4);
-                    $detectedBrand = $this->getCardBrand($cleanCardNumber);
-
-                    // Buscar duplicado de tarjeta
-                    $savedCard = SavedCard::where('user_id', $request->user()->id)
-                        ->where('card_hash', $cardHash)
-                        ->first();
-
-                    if (!$savedCard) {
-                        $savedCard = SavedCard::create([
-                            'user_id'         => $request->user()->id,
-                            'cardholder_name' => $validated['cardholder_name'],
-                            'last_four'       => $lastFour,
-                            'brand'           => $detectedBrand,
-                            'expiry_month'    => $expiryMonth,
-                            'expiry_year'     => $expiryYear,
-                            'token'           => 'tok_' . Str::random(24),
-                            'card_hash'       => $cardHash,
-                        ]);
-                    }
-
-                    $cardholderName = $savedCard->cardholder_name;
-                    $cardLastFour   = $savedCard->last_four;
-                    $cardBrand      = $savedCard->brand;
-                    $savedCardId    = $savedCard->id;
-                }
-            }
+            $paymentMethod = $validated['payment_method'] ?? 'cash';
 
             $order = Order::create([
-                'user_id'         => $request->user()->id,
-                'address_id'      => $validated['address_id'] ?? null,
-                'total'           => round($total, 2),
-                'status'          => $validated['payment_method'] === 'card' ? 'paid' : 'pending',
-                'payment_method'  => $validated['payment_method'],
-                'card_last_four'  => $cardLastFour,
-                'card_brand'      => $cardBrand,
-                'cardholder_name' => $cardholderName,
-                'saved_card_id'   => $savedCardId,
+                'user_id'    => $request->user()->id,
+                'address_id' => $validated['address_id'] ?? null,
+                'total'      => round($total, 2),
+                'status'     => $paymentMethod === 'card' ? 'paid' : 'pending',
             ]);
 
             $order->items()->createMany($itemsData);
