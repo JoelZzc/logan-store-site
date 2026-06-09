@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\SavedCardController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
@@ -64,6 +65,12 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('addresses', [AddressController::class, 'store']);
     Route::put('addresses/{address}',[AddressController::class, 'update']);
     Route::delete('addresses/{address}',[AddressController::class, 'destroy']);
+});
+
+//rutas protegidas saved-cards
+Route::middleware('auth:sanctum')->group(function(){
+    Route::get('saved-cards', [SavedCardController::class, 'index']);
+    Route::delete('saved-cards/{savedCard}', [SavedCardController::class, 'destroy']);
 });
 
 // rutas protegidas reportes

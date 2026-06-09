@@ -93,6 +93,14 @@ export default function OrderConfirmation() {
                             <span className="text-[11px] text-[#7a7672] font-light tracking-wide">ESTADO</span>
                             <span className="text-[12px] text-[#2a2826] font-normal capitalize">{order.status}</span>
                         </div>
+                        {order.payment_method && (
+                            <div className="flex justify-between">
+                                <span className="text-[11px] text-[#7a7672] font-light tracking-wide">MÉTODO DE PAGO</span>
+                                <span className="text-[12px] text-[#2a2826] font-normal uppercase">
+                                    {order.payment_method === 'card' ? `${order.card_brand || 'Tarjeta'} (•••• ${order.card_last_four})` : 'Efectivo'}
+                                </span>
+                            </div>
+                        )}
                         <div className="flex justify-between pt-1 border-t border-[#e4e0db]">
                             <span className="text-[11px] text-[#7a7672] font-light tracking-wide">TOTAL</span>
                             <span className="text-sm text-[#2a2826] font-normal">${order.total}</span>

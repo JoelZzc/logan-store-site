@@ -104,8 +104,8 @@ export default function Orders() {
                                 </div>
 
                                 {/* Dirección y envío */}
-                                {(order.address || order.shipment) && (
-                                    <div className="px-6 py-3 bg-[#f9f7f5] border-t border-[#e4e0db] text-[11px] text-[#7a7672] font-light flex gap-8">
+                                {(order.address || order.shipment || order.payment_method) && (
+                                    <div className="px-6 py-3 bg-[#f9f7f5] border-t border-[#e4e0db] text-[11px] text-[#7a7672] font-light flex gap-8 flex-wrap">
                                         {order.address && (
                                             <span>📍 {order.address.street}, {order.address.city}</span>
                                         )}
@@ -113,6 +113,9 @@ export default function Orders() {
                                             <span>📦 {order.shipment.carrier}
                                                 {order.shipment.tracking_number && ` · ${order.shipment.tracking_number}`}
                                             </span>
+                                        )}
+                                        {order.payment_method && (
+                                            <span className="capitalize">💳 {order.payment_method === 'card' ? `${order.card_brand || 'Tarjeta'} (•••• ${order.card_last_four})` : 'Efectivo'}</span>
                                         )}
                                     </div>
                                 )}

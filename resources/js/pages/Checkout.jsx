@@ -2,8 +2,23 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { getAddresses, createAddress, createOrder, applyCoupon } from '../services/api';
+import { getAddresses, createAddress, createOrder, applyCoupon, getSavedCards, deleteSavedCard } from '../services/api';
 import Navbar from '../components/Navbar';
+
+const formatCardNumber = (value) => {
+    const clean = value.replace(/\D/g, '');
+    const match = clean.match(/.{1,4}/g);
+    return match ? match.slice(0, 4).join('-') : clean;
+};
+
+const getCardBrandName = (number) => {
+    const clean = number.replace(/\D/g, '');
+    if (clean.startsWith('4')) return 'Visa';
+    if (/^5[1-5]/.test(clean) || /^2(22[1-9]|2[3-9]|[3-6]|7[0-1]|720)/.test(clean)) return 'Mastercard';
+    if (/^3[47]/.test(clean)) return 'American Express';
+    if (/^6(?:011|5)/.test(clean)) return 'Discover';
+    return '';
+};
 
 export default function Checkout() {
     const { user } = useAuth();
@@ -16,6 +31,16 @@ export default function Checkout() {
     const [couponCode, setCouponCode] = useState('');
     const [appliedCoupon, setAppliedCoupon] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    const [savedCards, setSavedCards] = useState([]);
+    const [selectedSavedCard, setSelectedSavedCard] = useState(null);
+    const [paymentMethod, setPaymentMethod] = useState('cash'); // 'cash' or 'card'
+    const [newCard, setNewCard] = useState({
+        cardholder_name: '',
+        card_number: '',
+        expiry_date: '',
+        cvv: '',
+    });
 
     const [newAddress, setNewAddress] = useState({
         street: '',
@@ -38,6 +63,7 @@ export default function Checkout() {
         }
 
         loadAddresses();
+        loadSavedCards();
     }, [user, cart]);
 
     const loadAddresses = async () => {
@@ -51,6 +77,35 @@ export default function Checkout() {
             }
         } catch (error) {
             console.error('Error cargando direcciones:', error);
+        }
+    };
+
+    const loadSavedCards = async () => {
+        try {
+            const response = await getSavedCards();
+            const cardsList = response.data.data || response.data;
+            setSavedCards(cardsList);
+
+            if (cardsList.length > 0) {
+                setSelectedSavedCard(cardsList[0].id);
+            } else {
+                setSelectedSavedCard('new');
+            }
+        } catch (error) {
+            console.error('Error cargando tarjetas guardadas:', error);
+        }
+    };
+
+    const handleDeleteCard = async (id, e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        if (!confirm('¿Estás seguro de que deseas eliminar esta tarjeta?')) return;
+        try {
+            await deleteSavedCard(id);
+            loadSavedCards();
+        } catch (error) {
+            console.error('Error al eliminar la tarjeta:', error);
+            alert('No se pudo eliminar la tarjeta');
         }
     };
 
@@ -104,17 +159,55 @@ export default function Checkout() {
             return;
         }
 
+        // Validación de campos de tarjeta
+        if (paymentMethod === 'card') {
+            if (selectedSavedCard === 'new') {
+                if (!newCard.cardholder_name.trim()) {
+                    alert('Por favor ingresa el nombre del titular de la tarjeta.');
+                    return;
+                }
+                const cleanNum = newCard.card_number.replace(/\D/g, '');
+                if (cleanNum.length !== 16) {
+                    alert('El número de tarjeta debe tener 16 dígitos.');
+                    return;
+                }
+                if (!newCard.expiry_date.match(/^(0[1-9]|1[0-2])\/[0-9]{2}$/)) {
+                    alert('La fecha de vencimiento debe tener el formato MM/YY.');
+                    return;
+                }
+                if (newCard.cvv.length < 3 || newCard.cvv.length > 4) {
+                    alert('El CVV debe tener 3 o 4 dígitos.');
+                    return;
+                }
+            } else if (!selectedSavedCard) {
+                alert('Selecciona una tarjeta guardada o agrega una nueva.');
+                return;
+            }
+        }
+
         setLoading(true);
 
         try {
             const orderData = {
                 address_id:  selectedAddress,
                 coupon_code: appliedCoupon ? appliedCoupon.code : null,
+                payment_method: paymentMethod,
                 items: cart.map(item => ({
                     product_id: item.product.id,
                     quantity:   item.quantity,
                 })),
             };
+
+            if (paymentMethod === 'card') {
+                if (selectedSavedCard !== 'new') {
+                    orderData.saved_card_id = selectedSavedCard;
+                } else {
+                    orderData.cardholder_name = newCard.cardholder_name;
+                    orderData.card_number = newCard.card_number;
+                    orderData.expiry_date = newCard.expiry_date;
+                    orderData.cvv = newCard.cvv;
+                }
+            }
 
             const response = await createOrder(orderData);
             clearCart();
@@ -259,6 +352,187 @@ export default function Checkout() {
                                             </div>
                                         </label>
                                     ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Método de Pago */}
+                        <div className="border-t border-[#e4e0db] pt-8">
+                            <p className="text-[9px] tracking-[.18em] text-[#b08070] mb-1">MÉTODO DE PAGO</p>
+                            <h2
+                                className="text-lg font-light text-[#2a2826] mb-5"
+                                style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                            >
+                                Selecciona cómo pagar
+                            </h2>
+
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                <label
+                                    className={`flex items-center gap-3 p-5 border cursor-pointer transition-colors ${
+                                        paymentMethod === 'cash'
+                                            ? 'border-[#2a2826] bg-white'
+                                            : 'border-[#e4e0db] bg-white hover:bg-[#f4f0ec]'
+                                    }`}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="paymentMethod"
+                                        value="cash"
+                                        checked={paymentMethod === 'cash'}
+                                        onChange={() => setPaymentMethod('cash')}
+                                        className="accent-[#2a2826]"
+                                    />
+                                    <div>
+                                        <p className="text-sm font-normal text-[#2a2826]">Efectivo</p>
+                                        <p className="text-[10px] text-[#7a7672] font-light mt-0.5">Paga al recibir tu pedido</p>
+                                    </div>
+                                </label>
+                                <label
+                                    className={`flex items-center gap-3 p-5 border cursor-pointer transition-colors ${
+                                        paymentMethod === 'card'
+                                            ? 'border-[#2a2826] bg-white'
+                                            : 'border-[#e4e0db] bg-white hover:bg-[#f4f0ec]'
+                                    }`}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="paymentMethod"
+                                        value="card"
+                                        checked={paymentMethod === 'card'}
+                                        onChange={() => setPaymentMethod('card')}
+                                        className="accent-[#2a2826]"
+                                    />
+                                    <div>
+                                        <p className="text-sm font-normal text-[#2a2826]">Tarjeta</p>
+                                        <p className="text-[10px] text-[#7a7672] font-light mt-0.5">Crédito o Débito</p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            {paymentMethod === 'cash' && (
+                                <div className="p-5 bg-[#f4f0ec] border border-[#e4e0db] text-xs text-[#7a7672] font-light mb-6 leading-relaxed">
+                                    Pago en efectivo al momento de la entrega. Asegúrate de contar con el monto exacto para facilitar la entrega con el transportista.
+                                </div>
+                            )}
+
+                            {paymentMethod === 'card' && (
+                                <div className="space-y-6 mb-6">
+                                    {savedCards.length > 0 && (
+                                        <div className="space-y-3">
+                                            <p className="text-[10px] tracking-[.1em] text-[#7a7672] font-light uppercase">Tus tarjetas guardadas</p>
+                                            {savedCards.map((card) => (
+                                                <label
+                                                    key={card.id}
+                                                    className={`flex items-center justify-between p-4 border cursor-pointer transition-colors ${
+                                                        selectedSavedCard === card.id
+                                                            ? 'border-[#2a2826] bg-white'
+                                                            : 'border-[#e4e0db] bg-white hover:bg-[#f4f0ec]'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <input
+                                                            type="radio"
+                                                            name="savedCard"
+                                                            value={card.id}
+                                                            checked={selectedSavedCard === card.id}
+                                                            onChange={() => setSelectedSavedCard(card.id)}
+                                                            className="accent-[#2a2826]"
+                                                        />
+                                                         <div className="text-xs">
+                                                             <p className="font-normal text-[#2a2826] capitalize">
+                                                                 💳 {card.brand || 'Tarjeta'} •••• {card.last_four}
+                                                             </p>
+                                                            <p className="text-[10px] text-[#7a7672] font-light mt-0.5">
+                                                                {card.cardholder_name} · Exp: {String(card.expiry_month).padStart(2, '0')}/{String(card.expiry_year).slice(-2)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        onClick={(e) => handleDeleteCard(card.id, e)}
+                                                        className="text-[10px] text-[#b08070] hover:text-[#8a3a2a] bg-transparent border-none cursor-pointer tracking-wider"
+                                                    >
+                                                        ELIMINAR
+                                                    </button>
+                                                </label>
+                                            ))}
+                                            <label
+                                                className={`flex items-center gap-3 p-4 border cursor-pointer transition-colors ${
+                                                    selectedSavedCard === 'new'
+                                                        ? 'border-[#2a2826] bg-white'
+                                                        : 'border-[#e4e0db] bg-white hover:bg-[#f4f0ec]'
+                                                }`}
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="savedCard"
+                                                    value="new"
+                                                    checked={selectedSavedCard === 'new'}
+                                                    onChange={() => setSelectedSavedCard('new')}
+                                                    className="accent-[#2a2826]"
+                                                />
+                                                <span className="text-xs text-[#2a2826] font-light">+ Usar otra tarjeta</span>
+                                            </label>
+                                        </div>
+                                    )}
+
+                                    {(savedCards.length === 0 || selectedSavedCard === 'new') && (
+                                        <div className="p-6 bg-[#f4f0ec] border border-[#e4e0db] space-y-4">
+                                            <p className="text-[10px] tracking-[.1em] text-[#b08070] font-light uppercase">Nueva Tarjeta</p>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Nombre en la tarjeta"
+                                                    value={newCard.cardholder_name}
+                                                    onChange={(e) => setNewCard({...newCard, cardholder_name: e.target.value})}
+                                                    className="col-span-2 px-4 py-3 border border-[#e4e0db] text-[#2a2826] text-sm font-light bg-white focus:outline-none focus:border-[#7a7672] transition-colors"
+                                                    required
+                                                />
+                                                <div className="col-span-2 relative">
+                                                    <input
+                                                        type="text"
+                                                        maxLength="19"
+                                                        placeholder="Número de tarjeta (xxxx-xxxx-xxxx-xxxx)"
+                                                        value={newCard.card_number}
+                                                        onChange={(e) => {
+                                                            const formatted = formatCardNumber(e.target.value);
+                                                            setNewCard({...newCard, card_number: formatted});
+                                                        }}
+                                                        className="w-full px-4 py-3 border border-[#e4e0db] text-[#2a2826] text-sm font-light bg-white focus:outline-none focus:border-[#7a7672] transition-colors pr-16"
+                                                        required
+                                                    />
+                                                    {getCardBrandName(newCard.card_number) && (
+                                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] tracking-wider text-[#b08070] uppercase font-light pointer-events-none">
+                                                            {getCardBrandName(newCard.card_number)}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Vencimiento (MM/YY)"
+                                                    maxLength="5"
+                                                    value={newCard.expiry_date}
+                                                    onChange={(e) => {
+                                                        let val = e.target.value.replace(/\D/g, '');
+                                                        if (val.length > 2) {
+                                                            val = val.substring(0, 2) + '/' + val.substring(2, 4);
+                                                        }
+                                                        setNewCard({...newCard, expiry_date: val});
+                                                    }}
+                                                    className="px-4 py-3 border border-[#e4e0db] text-[#2a2826] text-sm font-light bg-white focus:outline-none focus:border-[#7a7672] transition-colors"
+                                                    required
+                                                />
+                                                <input
+                                                    type="password"
+                                                    maxLength="4"
+                                                    placeholder="CVV"
+                                                    value={newCard.cvv}
+                                                    onChange={(e) => setNewCard({...newCard, cvv: e.target.value.replace(/\D/g, '')})}
+                                                    className="px-4 py-3 border border-[#e4e0db] text-[#2a2826] text-sm font-light bg-white focus:outline-none focus:border-[#7a7672] transition-colors"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

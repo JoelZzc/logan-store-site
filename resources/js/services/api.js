@@ -65,3 +65,7 @@ export const requestReturn = (orderId, data) => api.post(`/orders/${orderId}/ret
 export const updateReturn = (returnId, data) => api.patch(`/returns/${returnId}`, data);
 export const getCoupons = () => api.get('/coupons');
 export const applyCoupon = (code) => api.post('/coupons/apply', { code });
+
+// Saved Cards
+export const getSavedCards = () => api.get('/saved-cards');
+export const deleteSavedCard = (id) => api.delete(`/saved-cards/${id}`);

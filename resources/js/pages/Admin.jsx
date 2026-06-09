@@ -367,6 +367,11 @@ export default function Admin() {
                                                 <span className="text-[12px] font-normal text-[#2a2826]">{order.user}</span>
                                                 <span className="text-[12px] text-[#2a2826]">${parseFloat(order.total).toLocaleString('es-MX', {minimumFractionDigits: 2})}</span>
                                                 <span className="text-[9px] tracking-widest text-[#b08070] bg-[#f5e8e0] px-2 py-1">{order.status.toUpperCase()}</span>
+                                                {order.payment_method && (
+                                                    <span className="text-[9px] tracking-widest text-[#7a7672] bg-[#f4f0ec] px-2 py-1 uppercase font-light">
+                                                        {order.payment_method === 'card' ? `${order.card_brand || 'Tarjeta'} (•••• ${order.card_last_four})` : 'Efectivo'}
+                                                    </span>
+                                                )}
                                             </div>
                                             <div className="text-[11px] text-[#7a7672] font-light mb-2">
                                                 {order.items.map((item, i) => (

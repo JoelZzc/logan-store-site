@@ -14,6 +14,11 @@ class Order extends Model
         'address_id',
         'status',
         'total',
+        'payment_method',
+        'card_last_four',
+        'card_brand',
+        'cardholder_name',
+        'saved_card_id',
     ];
 
     public function user(){
@@ -34,6 +39,10 @@ class Order extends Model
 
     public function orderReturn(){
         return $this->hasOne(OrderReturn::class);
+    }
+
+    public function savedCard(){
+        return $this->belongsTo(SavedCard::class);
     }
 
 }
