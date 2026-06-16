@@ -1,59 +1,149 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# LoGan Store 🧴
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Plataforma de e-commerce para una perfumería, desarrollada como proyecto full-stack con **Laravel** en el backend y **React** en el frontend.
 
-## About Laravel
+> 🔗 **Demo en producción:** [logan-store-site-production.up.railway.app](https://logan-store-site-production.up.railway.app/)
+> *(El demo puede no estar disponible si el hosting gratuito ha expirado. Consulta la sección de instalación local para correrlo en tu máquina.)*
+>
+> **Credenciales de prueba (admin):**
+> - Email: `admin@loganstore.com`
+> - Password: `admin123456`
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Stack tecnológico
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Capa | Tecnología |
+|---|---|
+| Backend | Laravel 12, PHP 8.2 |
+| Frontend | React 19, Vite, Tailwind CSS 4 |
+| Base de datos | MySQL |
+| Autenticación | Laravel Sanctum (tokens) |
+| Gráficas | Recharts |
+| Deploy | Railway |
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Funcionalidades
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Cliente
+- Registro e inicio de sesión con autenticación por tokens
+- Catálogo de productos con filtros por categoría, marca y búsqueda
+- Detalle de producto con reseñas y calificaciones
+- Carrito de compras persistente (localStorage) con validación de stock en tiempo real
+- Checkout con selección de dirección, método de pago (efectivo o tarjeta) y cupones de descuento
+- Historial de pedidos con estado de envío
+- Solicitud de devoluciones
 
-## Laravel Sponsors
+### Administrador
+- Panel de administración para gestión de productos, cupones y envíos
+- Dashboard de ventas con gráficas de barras filtrables por período (hoy, semana, mes, año)
+- Auto-refresh cada 30 segundos
+- Alertas de stock bajo
+- Gestión de envíos por paquetería con número de rastreo
+- Aprobación o rechazo de devoluciones
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## Estructura de la base de datos
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```
+users           → clientes y administradores (roles: customer, admin)
+categories      → categorías de productos
+brands          → marcas de perfumes
+products        → catálogo con inventario (stock, min_stock, reorder_point)
+orders          → pedidos con dirección y total con descuento aplicado
+order_items     → productos individuales de cada pedido
+reviews         → reseñas y calificaciones de productos
+addresses       → direcciones de envío de los clientes
+coupons         → cupones de descuento (porcentaje o monto fijo)
+shipments       → información de envío por paquetería
+order_returns   → solicitudes de devolución
+```
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Instalación local
 
-## Code of Conduct
+### Requisitos
+- PHP 8.2+
+- Composer
+- Node.js 18+
+- MySQL
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Pasos
 
-## Security Vulnerabilities
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/JoelZzc/logan-store-site.git
+cd logan-store-site/backend
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 2. Instalar dependencias PHP
+composer install
 
-## License
+# 3. Instalar dependencias Node
+npm install
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 4. Configurar entorno
+cp .env.example .env
+php artisan key:generate
+
+# 5. Configurar base de datos en .env
+# DB_DATABASE=logan_store_db
+# DB_USERNAME=root
+# DB_PASSWORD=tu_password
+
+# 6. Correr migraciones y seeders
+php artisan migrate --seed
+
+# 7. Iniciar servidores (en terminales separadas)
+php artisan serve
+npm run dev
+```
+
+Abre [http://localhost:8000](http://localhost:8000)
+
+El seeder crea automáticamente:
+- Un usuario admin (`admin@loganstore.com` / `admin123456`)
+- Categorías, marcas y productos de ejemplo
+
+---
+
+## Variables de entorno necesarias
+
+```env
+APP_NAME="Logan Store"
+APP_ENV=production
+APP_KEY=
+APP_URL=https://tu-dominio.com
+
+DB_CONNECTION=mysql
+DB_HOST=
+DB_PORT=3306
+DB_DATABASE=
+DB_USERNAME=
+DB_PASSWORD=
+
+SESSION_DRIVER=file
+CACHE_STORE=file
+```
+
+---
+
+## Arquitectura
+
+```
+Browser (React SPA)
+      ↕ HTTP/JSON
+Laravel API (routes/api.php)
+      ↕ Eloquent ORM
+MySQL
+```
+
+El frontend es un SPA servido por Laravel con Vite. React Router maneja las rutas del cliente y Axios consume la API REST.
+
+---
+
+## Autor
+
+Desarrollado por **Joel Zazueta Carrillo** como proyecto de portafolio.
